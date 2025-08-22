@@ -1,7 +1,8 @@
 # vibecheck build and release automation
 
 # Default recipe
-default: build
+default: 
+    just --list
 
 # Build for current platform
 build:
