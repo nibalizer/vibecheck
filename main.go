@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"os"
 	"strings"
 
@@ -129,9 +128,9 @@ func generateAIBadge(ai int, agent string) string {
 	var logo string
 	switch strings.ToLower(agent) {
 	case "cursor":
-		logo = url.QueryEscape(cursorLogo)
+		logo = cursorLogo
 	case "amp":
-		logo = url.QueryEscape(ampLogo)
+		logo = ampLogo
 	case "claude":
 		logo = "anthropic"
 	default:
@@ -162,7 +161,7 @@ func escapeForShields(text string) string {
 
 func generateArtifactBadge(artifact, agent string) string {
 	if strings.ToLower(agent) == "amp" && strings.HasPrefix(artifact, "T-") {
-		logo := url.QueryEscape(ampLogo)
+		logo := ampLogo
 		artifactURL := generateArtifactURL(artifact, agent)
 		escapedArtifact := escapeForShields(artifact)
 		return fmt.Sprintf("[![amp thread](https://img.shields.io/badge/amp_thread-%s-green?logo=data:image/svg%%2bxml;base64,%s)](%s)", escapedArtifact, logo, artifactURL)
@@ -172,7 +171,7 @@ func generateArtifactBadge(artifact, agent string) string {
 	escapedArtifact := escapeForShields(artifact)
 	switch strings.ToLower(agent) {
 	case "amp":
-		logo = url.QueryEscape(ampLogo)
+		logo = ampLogo
 		return fmt.Sprintf("![artifact](https://img.shields.io/badge/artifact-%s-blue?logo=data:image/svg%%2bxml;base64,%s)", escapedArtifact, logo)
 	default:
 		return fmt.Sprintf("![artifact](https://img.shields.io/badge/artifact-%s-blue)", escapedArtifact)
