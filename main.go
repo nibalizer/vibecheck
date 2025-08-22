@@ -77,8 +77,9 @@ func runVibeCheck(cmd *cobra.Command, args []string) {
 }
 
 func outputText(data VibeData) {
-	output := fmt.Sprintf("Sick! You wrote %d%% of this code, %s wrote %d%%, you're saying this is %d%% vibe coded, and the development artifacts are at url example.com/%s",
-		data.Human, data.Agent, data.AI, data.Vibes, data.Artifact)
+	artifactURL := generateArtifactURL(data.Artifact, data.Agent)
+	output := fmt.Sprintf("Sick! You wrote %d%% of this code, %s wrote %d%%, you're saying this is %d%% vibe coded, and the development artifacts are at url %s",
+		data.Human, data.Agent, data.AI, data.Vibes, artifactURL)
 	fmt.Println(output)
 }
 
@@ -147,14 +148,34 @@ func generateAIBadge(ai int, agent string) string {
 	return fmt.Sprintf("![AI](https://img.shields.io/badge/AI-%d%%25-%s)", ai, color)
 }
 
+func generateArtifactURL(artifact, agent string) string {
+	if strings.ToLower(agent) == "amp" && strings.HasPrefix(artifact, "T-") {
+		return fmt.Sprintf("https://ampcode.com/threads/%s", artifact)
+	}
+	return fmt.Sprintf("example.com/%s", artifact)
+}
+
+func escapeForShields(text string) string {
+	// For shields.io, single dashes need to be escaped as double dashes
+	return strings.ReplaceAll(text, "-", "--")
+}
+
 func generateArtifactBadge(artifact, agent string) string {
+	if strings.ToLower(agent) == "amp" && strings.HasPrefix(artifact, "T-") {
+		logo := url.QueryEscape(ampLogo)
+		artifactURL := generateArtifactURL(artifact, agent)
+		escapedArtifact := escapeForShields(artifact)
+		return fmt.Sprintf("[![amp thread](https://img.shields.io/badge/amp_thread-%s-green?logo=data:image/svg%%2bxml;base64,%s)](%s)", escapedArtifact, logo, artifactURL)
+	}
+	
 	var logo string
+	escapedArtifact := escapeForShields(artifact)
 	switch strings.ToLower(agent) {
 	case "amp":
 		logo = url.QueryEscape(ampLogo)
-		return fmt.Sprintf("![artifact](https://img.shields.io/badge/artifact-%s-blue?logo=data:image/svg%%2bxml;base64,%s)", url.QueryEscape(artifact), logo)
+		return fmt.Sprintf("![artifact](https://img.shields.io/badge/artifact-%s-blue?logo=data:image/svg%%2bxml;base64,%s)", escapedArtifact, logo)
 	default:
-		return fmt.Sprintf("![artifact](https://img.shields.io/badge/artifact-%s-blue)", url.QueryEscape(artifact))
+		return fmt.Sprintf("![artifact](https://img.shields.io/badge/artifact-%s-blue)", escapedArtifact)
 	}
 }
 
